@@ -1,4 +1,5 @@
 const { mongoose, Schema } = require('../services/database');
+const bcrypt = require('bcrypt');
 
 const userSchema = new Schema({
   //Email
@@ -44,6 +45,17 @@ const userSchema = new Schema({
   role: { type: String, required: [true, 'Role is required'] },
   //Admin
   admin: { type: String, default: false },
+});
+
+userSchema.pre('save', async function (next) {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(this.password, salt);
+    this.password = hashedPassword;
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 const userModel = mongoose.model('user', userSchema, 'user');
