@@ -1,8 +1,8 @@
-const userModel = require('../models/user.model');
+const UserModel = require('../Models/User.model');
 
 exports.create = async (req, res) => {
   //Instancing user
-  const user = new userModel(req.body);
+  const user = new UserModel(req.body);
 
   //Validations
   user

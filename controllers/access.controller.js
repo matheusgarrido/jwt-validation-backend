@@ -1,5 +1,5 @@
-const userController = require('./user.controller');
+const UserController = require('./User.controller');
 
 exports.signup = async (req, res) => {
-  userController.create(req, res);
+  UserController.create(req, res);
 };

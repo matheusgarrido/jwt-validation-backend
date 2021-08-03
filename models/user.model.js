@@ -1,7 +1,7 @@
-const { mongoose, Schema } = require('../services/database');
+const { mongoose, Schema } = require('../Services/Database');
 const bcrypt = require('bcrypt');
 
-const userSchema = new Schema({
+const UserSchema = new Schema({
   //Email
   email: {
     type: String,
@@ -47,7 +47,7 @@ const userSchema = new Schema({
   admin: { type: String, default: false },
 });
 
-userSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function (next) {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(this.password, salt);
@@ -58,6 +58,6 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-const userModel = mongoose.model('user', userSchema, 'user');
+const UserModel = mongoose.model('user', UserSchema, 'user');
 
-module.exports = userModel;
+module.exports = UserModel;
