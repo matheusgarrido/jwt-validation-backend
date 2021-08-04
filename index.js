@@ -5,10 +5,6 @@ require('dotenv/config');
 const UserRouter = require('./routes/User.route');
 const AccessRouter = require('./routes/Access.route.js');
 
-//DB connection
-const { connection } = require('./Services/Database');
-connection();
-
 //Vars
 const { PORT } = process.env;
 const URL_PATH = `http://localhost:${PORT}`;
