@@ -6,6 +6,7 @@ const UserSchema = new Schema({
   email: {
     type: String,
     unique: true,
+    lowercase: true,
     required: [true, 'E-mail is required'],
     //Check if has another a different user with same email
     validate: {
@@ -23,6 +24,7 @@ const UserSchema = new Schema({
   username: {
     type: String,
     unique: true,
+    lowercase: true,
     required: [true, 'Username is required'],
     //Check if has another a different user with same username
     validate: {
