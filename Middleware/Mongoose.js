@@ -9,6 +9,7 @@ const connection = async () => {
     await mongoose.connect(DB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useCreateIndex: true,
     });
     console.log('✔️  Successful database connection');
   } catch (error) {
@@ -16,5 +17,14 @@ const connection = async () => {
     process.exit();
   }
 };
+
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️  Database connection is closed');
+});
+
+process.on('SIGINT', async () => {
+  await mongoose.connection.close();
+  process.exit();
+});
 
 module.exports = { mongoose, Schema, connection };
