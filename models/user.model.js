@@ -28,6 +28,8 @@ const UserSchema = new Schema({
   role: { type: String, required: [true, 'Role is required'] },
   //Admin
   admin: { type: String, default: false },
+  dt_creation: { type: Date, default: Date.now },
+  dt_last_update: { type: Date, default: Date.now },
 });
 
 UserSchema.pre('save', async function (next) {
