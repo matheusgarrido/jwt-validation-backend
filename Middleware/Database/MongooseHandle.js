@@ -1,4 +1,4 @@
-const { mongoose, Schema } = require('./MongooseConfig');
+const { mongoose } = require('./MongooseConfig');
 
 //Convert array of JSON to filter
 const generateFilter = (dataToFilter) => {
@@ -19,4 +19,4 @@ const findOne = async (model, filter) => {
   return await mongoose.model(model).findOne(filter);
 };
 
-module.exports = { mongoose, Schema, generateFilter, findOne, getModelByName };
+module.exports = { mongoose, generateFilter, findOne, getModelByName };

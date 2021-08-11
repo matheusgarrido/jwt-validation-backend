@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 require('dotenv/config');
 
-const { Schema } = mongoose;
 const { DB_URL } = process.env;
 
 //Database Connection
@@ -33,4 +32,4 @@ process.on('SIGINT', async () => {
 //Connect the database
 connection();
 
-module.exports = { mongoose, Schema };
+module.exports = { mongoose };

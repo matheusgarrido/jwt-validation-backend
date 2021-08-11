@@ -1,5 +1,5 @@
 const Database = require('./MongooseHandle');
-const { mongoose, Schema } = Database;
+const { mongoose } = Database;
 
 //If this field exists
 const isExistingField = async (modelName, dataToFilter) => {
@@ -15,4 +15,4 @@ const isDuplicatedField = async (modelName, model, field) => {
   return await isExistingField(modelName, filter);
 };
 
-module.exports = { mongoose, Schema, isExistingField, isDuplicatedField };
+module.exports = { mongoose, isExistingField, isDuplicatedField };

@@ -1,5 +1,6 @@
-const { mongoose, Schema } = require('../Middleware/Database/DatabaseHandle');
+const { mongoose } = require('../Middleware/Database/DatabaseHandle');
 const bcrypt = require('bcrypt');
+const { Schema } = mongoose;
 
 const UserSchema = new Schema({
   //Email
