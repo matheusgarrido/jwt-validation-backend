@@ -1,28 +1,41 @@
 const UserModel = require('../Models/User.model');
+const { isDuplicatedField } = require('../Middleware/Database/DatabaseHandle');
+const createError = require('http-errors');
 
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   //Instancing user
   const user = new UserModel(req.body);
-
-  //Validations
-  user
-    .validate()
-    //If hasn't errors
-    .then(async () => {
-      try {
+  try {
+    const conflictList = {};
+    //If e-mail already registered
+    if (await isDuplicatedField('user', user, 'email')) {
+      conflictList['email'] = 'E-mail already registered';
+    }
+    //If username already registered
+    if (await isDuplicatedField('user', user, 'username')) {
+      conflictList['username'] = 'Username already registered';
+    }
+    if (Object.keys(conflictList).length) {
+      throw createError.Conflict(conflictList);
+    }
+    //Validating data
+    user
+      .validate()
+      .then(async () => {
         await user.save();
-        res.status(201).json({ error: false });
-      } catch (e) {
-        //Error while saving
-        res.status(500).json({ error: true });
-      }
-    })
-    //Has errors
-    .catch(({ errors }) => {
-      const errorList = {};
-      Object.keys(errors).map((error) => {
-        errorList[errors[error].path] = errors[error].message;
+        res
+          .status(201)
+          .json({ status: 201, message: 'Successful user creation' });
+      })
+      //If validation fails
+      .catch((err) => {
+        errorList = {};
+        Object.keys(err.errors).map((error) => {
+          errorList[err.errors[error].path] = err.errors[error].message;
+        });
+        next(createError.BadRequest(errorList));
       });
-      res.status(500).json({ error: true, errorList });
-    });
+  } catch (err) {
+    next(err);
+  }
 };

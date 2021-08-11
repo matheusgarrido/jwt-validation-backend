@@ -1,4 +1,4 @@
-const { mongoose, Schema } = require('../Services/Database');
+const { mongoose, Schema } = require('../Middleware/Database/DatabaseHandle');
 const bcrypt = require('bcrypt');
 
 const UserSchema = new Schema({
@@ -8,15 +8,6 @@ const UserSchema = new Schema({
     unique: true,
     lowercase: true,
     required: [true, 'E-mail is required'],
-    //Check if has another a different user with same email
-    validate: {
-      validator: async function (value) {
-        return await this.constructor.findOne({ email: value }).then((user) => {
-          return user ? user._id.equals(this._id) : true;
-        });
-      },
-      message: () => `This e-mail is already used by a user`,
-    },
   },
   //Password
   password: { type: String, required: [true, 'Password is required'] },
@@ -26,17 +17,6 @@ const UserSchema = new Schema({
     unique: true,
     lowercase: true,
     required: [true, 'Username is required'],
-    //Check if has another a different user with same username
-    validate: {
-      validator: async function (value) {
-        return await this.constructor
-          .findOne({ username: value })
-          .then((user) => {
-            return user ? user._id.equals(this._id) : true;
-          });
-      },
-      message: () => `This username is already used by a user`,
-    },
   },
   //Birth date
   dt_birth: {

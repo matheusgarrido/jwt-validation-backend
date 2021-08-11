@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv/config');
 const UserRouter = require('./routes/User.route');
-const AccessRouter = require('./routes/Access.route.js');
+const ErrorHandle = require('./Middleware/ErrorHandle');
 
 //Vars
 const { PORT } = process.env;
@@ -16,7 +16,7 @@ App.use(bodyParser.urlencoded({ extended: false }));
 
 //Routes
 App.use('/user', UserRouter);
-App.use('/access', AccessRouter);
+App.use(ErrorHandle.Error404, ErrorHandle.ErrorMessage);
 
 //App start
 App.listen(PORT, () => {

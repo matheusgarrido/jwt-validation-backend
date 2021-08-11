@@ -4,6 +4,7 @@ require('dotenv/config');
 const { Schema } = mongoose;
 const { DB_URL } = process.env;
 
+//Database Connection
 const connection = async () => {
   try {
     await mongoose.connect(DB_URL, {
@@ -18,13 +19,18 @@ const connection = async () => {
   }
 };
 
+//Disconnection log
 mongoose.connection.on('disconnected', () => {
   console.log('⚠️  Database connection is closed');
 });
 
+//Close mongoose when system finishes
 process.on('SIGINT', async () => {
   await mongoose.connection.close();
   process.exit();
 });
 
-module.exports = { mongoose, Schema, connection };
+//Connect the database
+connection();
+
+module.exports = { mongoose, Schema };
