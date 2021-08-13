@@ -1,5 +1,4 @@
-const { mongoose } = require('../Middleware/Database/DatabaseHandle');
-const bcrypt = require('bcrypt');
+const { mongoose, hashData } = require('../Middleware/Database/DatabaseHandle');
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -28,14 +27,16 @@ const UserSchema = new Schema({
   role: { type: String, required: [true, 'Role is required'] },
   //Admin
   admin: { type: String, default: false },
+  //Creation and last update dates
   dt_creation: { type: Date, default: Date.now },
   dt_last_update: { type: Date, default: Date.now },
 });
 
 UserSchema.pre('save', async function (next) {
   try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(this.password, salt);
+    this.dt_creation = new Date();
+    this.dt_last_update = new Date();
+    const hashedPassword = await hashData(this.password);
     this.password = hashedPassword;
     next();
   } catch (error) {

@@ -1,4 +1,6 @@
 const Database = require('./MongooseHandle');
+const bcrypt = require('bcrypt');
+
 const { mongoose } = Database;
 
 //If this field exists
@@ -15,4 +17,9 @@ const isDuplicatedField = async (modelName, model, field) => {
   return await isExistingField(modelName, filter);
 };
 
-module.exports = { mongoose, isExistingField, isDuplicatedField };
+const hashData = async (data) => {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(data, salt);
+};
+
+module.exports = { mongoose, isExistingField, isDuplicatedField, hashData };
