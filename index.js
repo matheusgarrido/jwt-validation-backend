@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv/config');
 const UserRouter = require('./routes/User.route');
-const ErrorHandle = require('./Middleware/ErrorHandle');
+const ErrorHandle = require('./helpers/errorHandler');
 
 //Vars
 const { PORT } = process.env;

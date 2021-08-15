@@ -1,4 +1,4 @@
-const Database = require('./MongooseHandle');
+const Database = require('../Middleware/Database/MongooseHelper');
 const bcrypt = require('bcrypt');
 
 const { mongoose } = Database;
@@ -17,6 +17,7 @@ const isDuplicatedField = async (modelName, model, field) => {
   return await isExistingField(modelName, filter);
 };
 
+//Get a hash code from a data
 const hashData = async (data) => {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(data, salt);

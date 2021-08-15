@@ -1,5 +1,5 @@
 const UserModel = require('../Models/User.model');
-const { isDuplicatedField } = require('../Middleware/Database/DatabaseHandle');
+const { isDuplicatedField } = require('../helpers/database');
 const createError = require('http-errors');
 
 exports.create = async (req, res, next) => {

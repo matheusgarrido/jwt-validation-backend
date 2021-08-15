@@ -1,4 +1,4 @@
-const { mongoose, hashData } = require('../Middleware/Database/DatabaseHandle');
+const { mongoose, hashData } = require('../helpers/database');
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
