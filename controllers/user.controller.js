@@ -1,6 +1,7 @@
+const createError = require('http-errors');
 const UserModel = require('../Models/User.model');
 const { isDuplicatedField } = require('../helpers/database');
-const createError = require('http-errors');
+const JWT = require('../helpers/jwt');
 
 exports.create = async (req, res, next) => {
   //Instancing user
@@ -22,10 +23,16 @@ exports.create = async (req, res, next) => {
     user
       .validate()
       .then(async () => {
+        //Creating user
         await user.save();
-        res
-          .status(201)
-          .json({ status: 201, message: 'Successful user creation' });
+        //Generating access token
+        const accessToken = await JWT.signAccessToken(user.id);
+        //Returning message
+        res.status(201).json({
+          status: 201,
+          message: 'Successful user creation',
+          accessToken,
+        });
       })
       //If validation fails
       .catch((err) => {
