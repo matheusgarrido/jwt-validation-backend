@@ -2,30 +2,14 @@ const { mongoose, hashData } = require('../helpers/database');
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-  //Email
-  email: {
-    type: String,
-    unique: true,
-    lowercase: true,
-    required: [true, 'E-mail is required'],
-  },
-  //Password
-  password: { type: String, required: [true, 'Password is required'] },
-  //Username
-  username: {
-    type: String,
-    unique: true,
-    lowercase: true,
-    required: [true, 'Username is required'],
-  },
-  //Birth date
-  dt_birth: {
-    type: Date,
-    required: [true, 'Birth date is required'],
-  },
-  //Role
-  role: { type: String, required: [true, 'Role is required'] },
-  //Admin
+  //Access
+  email: { type: String, unique: true, lowercase: true, required: true },
+  password: { type: String, required: true },
+  username: { type: String, unique: true, lowercase: true, required: true },
+  //Personal data
+  dt_birth: { type: Date, required: true },
+  role: { type: String, required: true },
+  //Admin permissions
   admin: { type: String, default: false },
   //Creation and last update dates
   dt_creation: { type: Date, default: Date.now },

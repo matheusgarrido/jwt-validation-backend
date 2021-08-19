@@ -23,4 +23,19 @@ const hashData = async (data) => {
   return await bcrypt.hash(data, salt);
 };
 
-module.exports = { mongoose, isExistingField, isDuplicatedField, hashData };
+const getSchemaFields = (modelName, formData) => {
+  const schema = Database.getModelByName(modelName).schema;
+  const data = {};
+  Object.keys(schema.obj).map((field) => {
+    data[field] = formData[field];
+  });
+  return data;
+};
+
+module.exports = {
+  mongoose,
+  isExistingField,
+  isDuplicatedField,
+  hashData,
+  getSchemaFields,
+};

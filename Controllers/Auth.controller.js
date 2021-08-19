@@ -2,46 +2,36 @@ const createError = require('http-errors');
 const UserModel = require('../Models/User.model');
 const { isDuplicatedField } = require('../helpers/database');
 const JWT = require('../helpers/jwt');
+const Validation = require('../helpers/schemaValidation');
+const { getSchemaFields } = require('../helpers/database');
 
 exports.register = async (req, res, next) => {
-  //Instancing user
-  const user = new UserModel(req.body);
   try {
-    const conflictList = {};
+    //Getting the fields with their values
+    const formValue = getSchemaFields('user', req.body);
+    //Validating user
+    const userValidation = Validation.user(formValue);
+    if (userValidation.error) {
+      throw createError.BadRequest(userValidation.message);
+    }
+    //User Model
+    const user = new UserModel(userValidation.value);
     //If e-mail already registered
     if (await isDuplicatedField('user', user, 'email')) {
-      conflictList['email'] = 'E-mail already registered';
+      throw createError.Conflict('E-mail already registered');
     }
     //If username already registered
     if (await isDuplicatedField('user', user, 'username')) {
-      conflictList['username'] = 'Username already registered';
+      throw createError.Conflict('Username already registered');
     }
-    if (Object.keys(conflictList).length) {
-      throw createError.Conflict(conflictList);
-    }
-    //Validating data
-    user
-      .validate()
-      .then(async () => {
-        //Creating user
-        await user.save();
-        //Generating access token
-        const accessToken = await JWT.signAccessToken(user.id);
-        //Returning message
-        res.status(201).json({
-          status: 201,
-          message: 'Successful user creation',
-          accessToken,
-        });
-      })
-      //If validation fails
-      .catch((err) => {
-        errorList = {};
-        Object.keys(err.errors).map((error) => {
-          errorList[err.errors[error].path] = err.errors[error].message;
-        });
-        next(createError.BadRequest(errorList));
-      });
+    //Saving data
+    await user.save();
+    const accessToken = await JWT.signAccessToken(user.id);
+    res.status(201).json({
+      status: 201,
+      message: 'Successful user creation',
+      accessToken,
+    });
   } catch (err) {
     next(err);
   }
