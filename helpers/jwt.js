@@ -20,3 +20,14 @@ exports.signAccessToken = (userId) => {
     });
   });
 };
+
+exports.verifyAccessToken = (req, res, next) => {
+  if (!req.headers.authorization) next(createError.Unauthorized());
+  const { authorization } = req.headers;
+  const token = authorization.split(' ')[1];
+  JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, payload) => {
+    if (error) return next(createError.Unauthorized());
+    req.payload = payload;
+    next();
+  });
+};
