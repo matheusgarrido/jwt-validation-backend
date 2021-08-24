@@ -1,5 +1,5 @@
 const JWT = require('jsonwebtoken');
-// const createError = require('http-errors');
+const createError = require('http-errors');
 require('dotenv/config');
 
 exports.signAccessToken = (userId) => {
@@ -12,7 +12,10 @@ exports.signAccessToken = (userId) => {
       issuer: 'https://github.com/matheusgarrido',
     };
     JWT.sign(payload, secret, options, (err, token) => {
-      if (err) reject(err);
+      if (err) {
+        console.log(err);
+        reject(createError.InternalServerError());
+      }
       resolve(token);
     });
   });
