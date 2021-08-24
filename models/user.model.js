@@ -1,4 +1,4 @@
-const { mongoose, hashData } = require('../helpers/database');
+const { mongoose, hashData, validateHash } = require('../helpers/database');
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -27,6 +27,10 @@ UserSchema.pre('save', async function (next) {
     next(error);
   }
 });
+
+UserSchema.methods.isValidPassword = async function (password) {
+  return await validateHash(password, this.password);
+};
 
 const UserModel = mongoose.model('user', UserSchema, 'user');
 

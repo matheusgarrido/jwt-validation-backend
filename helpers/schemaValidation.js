@@ -1,5 +1,10 @@
 const Joi = require('@hapi/joi');
 
+// Schema fields config value
+const EMAIL_FIELD = Joi.string().email().lowercase().required();
+const PASSWORD_FIELD = Joi.string().min(6).required();
+const CURRENT_DATE_FIELD = Joi.date().default(new Date());
+
 function setMessageError(validation) {
   if (validation.error) {
     return {
@@ -10,17 +15,29 @@ function setMessageError(validation) {
   return validation;
 }
 
+function validate(schema, data) {
+  const validation = schema.validate(data);
+  return setMessageError(validation);
+}
+
 exports.user = (user) => {
   const schema = Joi.object({
-    email: Joi.string().email().lowercase().required(),
+    email: EMAIL_FIELD,
     username: Joi.string().min(3).required(),
-    password: Joi.string().min(6).required(),
+    password: PASSWORD_FIELD,
     dt_birth: Joi.date().required(),
     role: Joi.string().required(),
     admin: Joi.boolean(),
-    dt_creation: Joi.date().default(new Date()),
-    dt_last_update: Joi.date().default(new Date()),
+    dt_creation: CURRENT_DATE_FIELD,
+    dt_last_update: CURRENT_DATE_FIELD,
   });
-  const validation = schema.validate(user);
-  return setMessageError(validation);
+  return validate(schema, user);
+};
+
+exports.login = (login) => {
+  const schema = Joi.object({
+    email: EMAIL_FIELD,
+    password: PASSWORD_FIELD,
+  });
+  return validate(schema, login);
 };

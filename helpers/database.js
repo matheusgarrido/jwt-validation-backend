@@ -23,6 +23,16 @@ const hashData = async (data) => {
   return await bcrypt.hash(data, salt);
 };
 
+//Compares inputted password with saved hash password
+const validateHash = async (password, hashPassword) => {
+  try {
+    return await bcrypt.compare(password, hashPassword);
+  } catch (error) {
+    throw error;
+  }
+};
+
+//Returns all the fields and values from the DB model
 const getSchemaFields = (modelName, formData) => {
   const schema = Database.getModelByName(modelName).schema;
   const data = {};
@@ -37,5 +47,7 @@ module.exports = {
   isExistingField,
   isDuplicatedField,
   hashData,
+  validateHash,
   getSchemaFields,
+  ...Database,
 };
