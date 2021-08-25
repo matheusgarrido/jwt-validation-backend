@@ -26,10 +26,12 @@ exports.register = async (req, res, next) => {
     //Saving data
     await user.save();
     const accessToken = await JWT.signAccessToken(user.id);
+    const refreshToken = await JWT.signRefreshToken(user.id);
     res.status(201).json({
       status: 201,
       message: 'Successful user creation',
       accessToken,
+      refreshToken,
     });
   } catch (err) {
     next(err);
@@ -58,11 +60,26 @@ exports.login = async (req, res, next) => {
     }
     //Successful login
     const accessToken = await JWT.signAccessToken(user.id);
+    const refreshToken = await JWT.signRefreshToken(user.id);
     res.status(200).json({
       status: 200,
       message: 'Successful user login',
       accessToken,
+      refreshToken,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken: previousRefreshToken } = req.body;
+    if (!previousRefreshToken) throw createError.BadRequest();
+    const userId = await JWT.verifyRefreshToken(previousRefreshToken);
+    const accessToken = await JWT.signAccessToken(userId);
+    const refreshToken = await JWT.signRefreshToken(userId);
+    res.status(200).json({ accessToken, refreshToken });
   } catch (error) {
     next(error);
   }
