@@ -4,6 +4,7 @@ const Joi = require('@hapi/joi');
 const EMAIL_FIELD = Joi.string().email().lowercase().required();
 const PASSWORD_FIELD = Joi.string().min(6).required();
 const CURRENT_DATE_FIELD = Joi.date().default(new Date());
+const REFRESH_TOKENS_FIELD = [Joi.string()];
 
 function setMessageError(validation) {
   if (validation.error) {
@@ -20,7 +21,7 @@ function validate(schema, data) {
   return setMessageError(validation);
 }
 
-exports.user = (user) => {
+exports.userRegister = (user) => {
   const schema = Joi.object({
     email: EMAIL_FIELD,
     username: Joi.string().min(3).required(),
@@ -30,11 +31,12 @@ exports.user = (user) => {
     admin: Joi.boolean(),
     dt_creation: CURRENT_DATE_FIELD,
     dt_last_update: CURRENT_DATE_FIELD,
+    refresh_token_list: REFRESH_TOKENS_FIELD,
   });
   return validate(schema, user);
 };
 
-exports.login = (login) => {
+exports.userLogin = (login) => {
   const schema = Joi.object({
     email: EMAIL_FIELD,
     password: PASSWORD_FIELD,

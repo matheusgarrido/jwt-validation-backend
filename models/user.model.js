@@ -1,5 +1,6 @@
 const { mongoose, hashData, validateHash } = require('../helpers/database');
 const { Schema } = mongoose;
+const JWT = require('../helpers/jwt');
 
 const UserSchema = new Schema({
   //Access
@@ -14,22 +15,30 @@ const UserSchema = new Schema({
   //Creation and last update dates
   dt_creation: { type: Date, default: Date.now },
   dt_last_update: { type: Date, default: Date.now },
+  //Refresh Tokens array
+  refresh_token_list: [{ type: String }],
 });
 
-UserSchema.pre('save', async function (next) {
-  try {
-    this.dt_creation = new Date();
-    this.dt_last_update = new Date();
-    const hashedPassword = await hashData(this.password);
-    this.password = hashedPassword;
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+UserSchema.methods.hashPassword = async function (password) {
+  const hashedPassword = await hashData(password);
+  this.password = hashedPassword;
+};
 
 UserSchema.methods.isValidPassword = async function (password) {
   return await validateHash(password, this.password);
+};
+
+UserSchema.methods.deleteInvalidRefreshTokens = async function () {
+  const tokenList = [];
+  await this.refresh_token_list.map(async (token) => {
+    try {
+      await JWT.verifyRefreshToken(token);
+      tokenList.push(token);
+    } catch (error) {
+      return;
+    }
+  });
+  this.refresh_token_list = tokenList;
 };
 
 const UserModel = mongoose.model('user', UserSchema, 'user');
