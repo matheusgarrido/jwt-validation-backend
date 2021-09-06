@@ -37,19 +37,24 @@ exports.verifyAccessToken = (req, res, next) => {
   });
 };
 
-exports.signRefreshToken = (userId) => {
+exports.signRefreshToken = (user) => {
   return new Promise((resolve, reject) => {
+    const { _id: userId, refresh_token_list: tokenList } = user;
     const payload = {};
     const secret = process.env.REFRESH_TOKEN_SECRET;
     const options = {
       expiresIn: '1y',
-      audience: userId,
+      audience: userId.toString(),
       issuer: 'https://github.com/matheusgarrido',
     };
     JWT.sign(payload, secret, options, (err, token) => {
       if (err) {
+        console.log(err);
         reject(createError.InternalServerError());
       }
+      user.refresh_token_list = [token, ...tokenList];
+      user.deleteInvalidRefreshTokens();
+      user.save();
       resolve(token);
     });
   });
@@ -68,5 +73,22 @@ exports.verifyRefreshToken = (refreshToken) => {
         resolve(userId);
       }
     );
+  });
+};
+
+exports.verifyWhitelistRefreshToken = (user, token) => {
+  return new Promise(async (resolve, reject) => {
+    let tokenIndex = -1;
+    await user.refresh_token_list.filter((res, i) => {
+      if (res === token) {
+        tokenIndex = i;
+        return;
+      }
+    })[0];
+    //Invalid token
+    if (tokenIndex < 0) reject(createError.Unauthorized());
+    //Index of valid token
+    const tokenList = user.refresh_token_list.splice(tokenIndex, 1);
+    resolve(tokenList);
   });
 };

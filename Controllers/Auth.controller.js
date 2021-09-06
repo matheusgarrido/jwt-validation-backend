@@ -25,12 +25,10 @@ exports.register = async (req, res, next) => {
     }
     //Hash Password
     await user.hashPassword(user.password);
-    //Generating tokens
+    //Generate tokens and save the user with refresh token
     const accessToken = await JWT.signAccessToken(user.id);
-    const refreshToken = await JWT.signRefreshToken(user.id);
-    user.refresh_token_list = [refreshToken];
-    //Saving data
-    await user.save();
+    const refreshToken = await JWT.signRefreshToken(user);
+    //Send tokens
     res.status(201).json({
       status: 201,
       message: 'Successful user creation',
@@ -64,11 +62,7 @@ exports.login = async (req, res, next) => {
     }
     //Generating tokens
     const accessToken = await JWT.signAccessToken(user.id);
-    const refreshToken = await JWT.signRefreshToken(user.id);
-    user.refresh_token_list = [refreshToken, ...user.refresh_token_list];
-    //Deleting invalid tokens
-    user.deleteInvalidRefreshTokens();
-    user.save();
+    const refreshToken = await JWT.signRefreshToken(user);
     //Successful user login
     res.status(200).json({
       status: 200,
@@ -92,23 +86,11 @@ exports.refreshToken = async (req, res, next) => {
     const user = new UserModel(await Database.findOne('user', { _id: userId }));
     //Invalid user
     if (!user.username) throw createError.Unauthorized();
-    //Searching token saved at DB user
-    const { refresh_token_list: tokenList } = user;
-    let tokenIndex = -1;
-    tokenList.filter((res, i) => {
-      if (res === previousRefreshToken) {
-        tokenIndex = i;
-        return;
-      }
-    })[0];
-    //Invalid token
-    if (tokenIndex < 0) throw createError.Unauthorized();
+    //Token validation at whitelist saved at DB user
+    await JWT.verifyWhitelistRefreshToken(user, previousRefreshToken);
     //Refreshing tokens
     const accessToken = await JWT.signAccessToken(userId);
-    const refreshToken = await JWT.signRefreshToken(userId);
-    tokenList[tokenIndex] = refreshToken;
-    user.refresh_token_list = tokenList;
-    user.save();
+    const refreshToken = await JWT.signRefreshToken(user);
     res.status(200).json({ accessToken, refreshToken });
   } catch (error) {
     next(error);
