@@ -96,3 +96,28 @@ exports.refreshToken = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.logout = async (req, res, next) => {
+  try {
+    const { refreshToken: previousRefreshToken } = req.body;
+    if (!previousRefreshToken)
+      throw createError.BadRequest('Empty token sended');
+    //User data
+    const userId = await JWT.verifyRefreshToken(previousRefreshToken);
+    const user = new UserModel(await Database.findOne('user', { _id: userId }));
+    //Invalid user
+    if (!user.username) throw createError.Unauthorized();
+    //Token validation at whitelist saved at DB user
+    await JWT.verifyWhitelistRefreshToken(user, previousRefreshToken);
+    //Save the user after delete the refresh-token
+    user.save();
+    res.status(200).json({
+      status: 200,
+      message: 'Successful user logout',
+      accessToken: '',
+      refreshToken: '',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
