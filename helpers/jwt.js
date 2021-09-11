@@ -7,7 +7,7 @@ exports.signAccessToken = (userId) => {
     const payload = {};
     const secret = process.env.ACCESS_TOKEN_SECRET;
     const options = {
-      expiresIn: '15s',
+      expiresIn: '2d',
       audience: userId,
       issuer: 'https://github.com/matheusgarrido',
     };
