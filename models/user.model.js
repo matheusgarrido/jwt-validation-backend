@@ -11,7 +11,7 @@ const UserSchema = new Schema({
   dt_birth: { type: Date, required: true },
   role: { type: String, required: true },
   //Admin permissions
-  admin: { type: String, default: false },
+  admin: { type: Boolean, default: false },
   //Creation and last update dates
   dt_creation: { type: Date, default: Date.now },
   dt_last_update: { type: Date, default: Date.now },
