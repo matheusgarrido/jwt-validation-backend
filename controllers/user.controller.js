@@ -88,3 +88,18 @@ exports.changeUsername = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.changePersonalData = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const { dt_birth, role } = req.body;
+    user.dt_birth = dt_birth;
+    user.role = role;
+    user.save();
+    res
+      .status(200)
+      .json({ status: 200, message: 'Successful personal data change' });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -23,5 +23,11 @@ router.patch(
   UserController.verifyUserPassword,
   UserController.changeUsername
 );
+router.patch(
+  '/personal-data',
+  verifyAccessToken,
+  UserController.verifyUserPassword,
+  UserController.changePersonalData
+);
 
 module.exports = router;
