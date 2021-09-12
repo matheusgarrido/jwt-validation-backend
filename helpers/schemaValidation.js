@@ -6,7 +6,7 @@ const USERNAME_FIELD = Joi.string().min(3).required();
 const PASSWORD_FIELD = Joi.string().min(6).required();
 const DT_BIRTH_FIELD = Joi.date().required();
 const ROLE_FIELD = Joi.string().required();
-const ADMIN_FIELD = Joi.boolean();
+const ADMIN_FIELD = Joi.boolean().default(false);
 const REFRESH_TOKENS_FIELD = [Joi.string()];
 const CURRENT_DATE_FIELD = Joi.date().default(new Date());
 
@@ -79,4 +79,12 @@ exports.changePersonalData = (personalData) => {
     dt_last_update: CURRENT_DATE_FIELD,
   });
   return validate(schema, personalData);
+};
+
+exports.changeAdmin = (admin) => {
+  const schema = Joi.object({
+    admin: ADMIN_FIELD,
+    dt_last_update: CURRENT_DATE_FIELD,
+  });
+  return validate(schema, { admin });
 };

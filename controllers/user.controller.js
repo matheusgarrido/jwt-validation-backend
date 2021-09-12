@@ -137,3 +137,47 @@ exports.changePersonalData = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.changeAdmin = async (req, res, next) => {
+  try {
+    const currentUser = req.user;
+    //If current user is not an admin
+    if (!currentUser.admin) throw createError.Unauthorized();
+    //Validate all selected users
+    const { users } = req.body;
+    const usersList = await Promise.all(
+      users.map(async (user) => {
+        const { id, admin } = user;
+        //If the user to be updated is the current user
+        if (currentUser.equals(id)) {
+          throw createError.Unauthorized(
+            'Unable to remove your own admin role'
+          );
+        }
+        //If user not exists
+        const userToUpdate = new UserModel(
+          await Database.findOne('user', { _id: id })
+        );
+        if (!userToUpdate.username) {
+          throw createError.BadRequest(`Invalid user: ${id}`);
+        }
+        //Validate sended admin value
+        const adminValidation = Validation.changeAdmin(admin);
+        if (adminValidation.error) {
+          throw createError.BadRequest(adminValidation.message);
+        }
+        //User validated
+        userToUpdate.dt_last_update = adminValidation.value.dt_last_update;
+        userToUpdate.admin = admin;
+        return userToUpdate;
+      })
+    );
+    // Update users admin access
+    usersList.map((userToUpdate) => {
+      userToUpdate.save();
+    });
+    res.status(200).json({ status: 200, message: 'Successful admin changes' });
+  } catch (error) {
+    next(error);
+  }
+};
