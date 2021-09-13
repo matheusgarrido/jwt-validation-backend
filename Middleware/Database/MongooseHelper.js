@@ -14,9 +14,19 @@ const getModelByName = (model) => {
   return mongoose.model(model);
 };
 
+const getAllByModel = async (model) => {
+  return await mongoose.model(model).find();
+};
+
 //FindOne
 const findOne = async (model, filter) => {
   return await mongoose.model(model).findOne(filter);
 };
 
-module.exports = { mongoose, generateFilter, findOne, getModelByName };
+module.exports = {
+  mongoose,
+  generateFilter,
+  findOne,
+  getModelByName,
+  getAllByModel,
+};

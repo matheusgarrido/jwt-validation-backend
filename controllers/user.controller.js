@@ -138,11 +138,41 @@ exports.changePersonalData = async (req, res, next) => {
   }
 };
 
+exports.verifyAdminPermission = async (req, res, next) => {
+  try {
+    //If current user is not a admin
+    const { aud: id } = req.payload;
+    const currentUser = await Database.findOne('user', { _id: id });
+    if (!currentUser.admin) throw createError.Unauthorized();
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    //Get users id, username and admin status
+    const allUsers = await Database.getAllByModel('user');
+    const users = allUsers
+      .map((user) => {
+        const { _id, username, admin } = user;
+        return {
+          _id,
+          username,
+          admin,
+        };
+      })
+      .sort((a, b) => a.username.localeCompare(b.username));
+    res.status(200).json({ status: 200, users });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.changeAdmin = async (req, res, next) => {
   try {
     const currentUser = req.user;
-    //If current user is not an admin
-    if (!currentUser.admin) throw createError.Unauthorized();
     //Validate all selected users
     const { users } = req.body;
     const usersList = await Promise.all(

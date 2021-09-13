@@ -29,9 +29,16 @@ router.patch(
   UserController.verifyUserPassword,
   UserController.changePersonalData
 );
+router.get(
+  '/users',
+  verifyAccessToken,
+  UserController.verifyAdminPermission,
+  UserController.getAllUsers
+);
 router.patch(
   '/admin',
   verifyAccessToken,
+  UserController.verifyAdminPermission,
   UserController.verifyUserPassword,
   UserController.changeAdmin
 );
