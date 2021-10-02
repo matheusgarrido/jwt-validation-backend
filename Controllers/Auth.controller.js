@@ -52,7 +52,7 @@ exports.login = async (req, res, next) => {
     //Find user by email
     const INVALID_DATA = 'Invalid user access data';
     const user = new UserModel(await Database.findOne('user', { email }));
-    if (!user) {
+    if (!user || !user.email) {
       throw createError.Unauthorized(INVALID_DATA);
     }
     //Comparing inputted password and saved hash password
